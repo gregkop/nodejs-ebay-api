@@ -157,7 +157,7 @@ var buildXmlInput = function buildXmlInput(opType, params) {
   
   // for repeatable fields, use array values.
   // to keep this simpler, treat everything as an array value.
-  /*_(params).each(function(values, key) {
+  _(params).each(function(values, key) {
     
     if (!_.isArray(values)) values = [values];
     
@@ -166,7 +166,7 @@ var buildXmlInput = function buildXmlInput(opType, params) {
       el[key] = value;
       top.push(el);      
     });
-  });*/
+  });
   top.push(params);
 
   //\X\\\Corpseconsole.log(util.inspect(data,true,10));
