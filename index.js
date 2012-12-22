@@ -154,6 +154,14 @@ var buildXmlInput = function buildXmlInput(opType, params) {
     top.push({ 'RequesterCredentials' : [ { 'eBayAuthToken' : params.authToken } ] });
     delete params.authToken;
   }
+  if (typeof params.EndUserIP !== 'undefined') {
+    top.push({'EndUserIP' : params.EndUserIP });
+    delete params.EndUserIP;
+  }
+  if (typeof params.ItemID !== 'undefined') {
+    top.push({'ItemID' : params.ItemID });
+    delete params.ItemID;
+  }
   
   // for repeatable fields, use array values.
   // to keep this simpler, treat everything as an array value.
@@ -375,14 +383,16 @@ var ebayApiPostXmlRequest = function ebayApiPostXmlRequest(options, callback) {
   console.log(options.reqOptions.data);
   
   var request = restler.post(url, options.reqOptions);
-  
+  console.log(request, "request");
   request.on('complete', function(result, response) {
     if (result instanceof Error) {
       var error = result;
       error.message = "Completed with error: " + error.message;
+      console.log (error, "error in oncomplete");
       return callback(error);
     }
     else if (response.statusCode !== 200) {
+      console.log (response, "not 200 status in oncomplete");
       return callback(new Error(util.format("Bad response status code", response.statusCode, result.toString())));
     }
     
@@ -403,6 +413,7 @@ var ebayApiPostXmlRequest = function ebayApiPostXmlRequest(options, callback) {
             error.message = "Error parsing XML: " + error.message;
             return next(error);
           }
+          
           next(null, data);
         });
       },
