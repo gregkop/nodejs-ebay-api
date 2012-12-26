@@ -13,7 +13,7 @@ var restler = require('restler'),
 //  - use arrays for repeating keys
 var buildUrlParams = function buildUrlParams(params) {
   var urlFilters = [];  // string parts to be joined
-  console.log(params, "url params");
+  
   // (force each to be string w/ ''+var)
   _(params).each(function(value, key) {
     if (value === null) urlFilters.push('' + key);
@@ -27,8 +27,6 @@ var buildUrlParams = function buildUrlParams(params) {
   
   return urlFilters.join('&');
 };
-
-
 
 
 
@@ -78,7 +76,7 @@ var buildFilters = function buildFilters(filterType, filters) {
 // params,filters only apply to GET requests; for POST pass in empty {} or null
 var buildRequestUrl = function buildRequestUrl(serviceName, params, filters, sandbox) {
   var url;
-  console.log(params, "params in buildRequestUrl**************************");
+  
   params = params || {};
   filters = filters || {};
   sandbox = (typeof sandbox === 'boolean') ? sandbox : false;
@@ -94,7 +92,7 @@ var buildRequestUrl = function buildRequestUrl(serviceName, params, filters, san
       
     case 'Shopping':
       if (sandbox) {
-        //url = 'http://open.api.sandbox.ebay.com/shopping?';
+        // url =   // @todo
         throw new Error("Sandbox endpoing for Shopping service not yet implemented. Please add.");
       }
       else url = "http://open.api.ebay.com/shopping?";
@@ -104,10 +102,10 @@ var buildRequestUrl = function buildRequestUrl(serviceName, params, filters, san
     case 'Trading':   // ...and the other XML APIs
       if (sandbox) url = 'https://api.sandbox.ebay.com/ws/api.dll';
       else url = 'https://api.ebay.com/ws/api.dll';
-      console.log(url, "url in trading***********************");
+      
       // params and filters don't apply to URLs w/ these
       return url;
-       //break;
+      // break;
     
     default:
       if (sandbox) {
@@ -118,7 +116,7 @@ var buildRequestUrl = function buildRequestUrl(serviceName, params, filters, san
   }
 
   url += buildUrlParams(params);     // no trailing &
-  console.log(url, "url after buildparams***********************");
+  
   _(filters).each(function(typeFilters, type) {
     url += buildFilters(type, typeFilters);     // each has leading &
   });
@@ -156,11 +154,7 @@ var buildXmlInput = function buildXmlInput(opType, params) {
     top.push({ 'RequesterCredentials' : [ { 'eBayAuthToken' : params.authToken } ] });
     delete params.authToken;
   }
-  if (typeof params.EndUserIP !== 'undefined'){
-
-    top.push({'EndUserIP' : params.EndUserIP});
-    delete params.EndUserIP;
-  }
+  
   // for repeatable fields, use array values.
   // to keep this simpler, treat everything as an array value.
   _(params).each(function(values, key) {
@@ -269,7 +263,6 @@ var ebayApiGetRequest = function ebayApiGetRequest(options, callback) {
   // console.log('url for', options.opType, 'request:\n', url.replace(/\&/g, '\n&'));
   
   var request = restler.get(url, options.reqOptions);
-  //console.log(request, "request");
   var data;
 
   // emitted when the request has finished whether it was successful or not
@@ -288,7 +281,6 @@ var ebayApiGetRequest = function ebayApiGetRequest(options, callback) {
     }
     
     try {
-      console.log(result, "result");
       data = JSON.parse(result);
       
       // drill down to item(s). each service has its own structure.
@@ -405,7 +397,7 @@ var ebayApiPostXmlRequest = function ebayApiPostXmlRequest(options, callback) {
       function toJson(next) {
         var xml2js = require('xml2js'),
             parser = new xml2js.Parser();
-        //result = '<?xml version="1.0" encoding="utf-8"?><GetOrdersResponse xmlns="urn:ebay:apis:eBLBaseComponents"><Timestamp>2007-12-10T16:12:55.184Z</Timestamp><Ack>Success</Ack><Version>539</Version><Build>e539_core_Bundled_5642307_R1</Build><OrderArray><Order><OrderID>865826</OrderID><OrderStatus>Active</OrderStatus><AdjustmentAmount currencyID="USD">0.0</AdjustmentAmount><AmountSaved currencyID="USD">0.0</AmountSaved><CheckoutStatus><eBayPaymentStatus>NoPaymentFailure</eBayPaymentStatus><LastModifiedTime>2007-12-10T16:09:47.000Z</LastModifiedTime><PaymentMethod>None</PaymentMethod><Status>Incomplete</Status></CheckoutStatus><ShippingDetails><SalesTax><SalesTaxPercent>0.0</SalesTaxPercent><SalesTaxState/><ShippingIncludedInTax>false</ShippingIncludedInTax><SalesTaxAmount currencyID="USD">0.0</SalesTaxAmount></SalesTax><ShippingServiceOptions><ShippingService>ShippingMethodStandard</ShippingService><ShippingServicePriority>1</ShippingServicePriority><ExpeditedService>false</ExpeditedService></ShippingServiceOptions><SellingManagerSalesRecordNumber>111</SellingManagerSalesRecordNumber><GetItFast>false</GetItFast></ShippingDetails><CreatingUserRole>Seller</CreatingUserRole><CreatedTime>2007-12-10T16:09:47.000Z</CreatedTime><PaymentMethods>PayPal</PaymentMethods><ShippingAddress><Name>Test User</Name><Street1>address</Street1><Street2/><CityName>city</CityName><StateOrProvince>WA</StateOrProvince><Country>CustomCode</Country><CountryName/><Phone>1-800-111-1111</Phone><PostalCode>98102</PostalCode><AddressID>3839387</AddressID><AddressOwner>eBay</AddressOwner><ExternalAddressID/></ShippingAddress><Subtotal currencyID="USD">36.0</Subtotal><Total currencyID="USD">36.0</Total><DigitalDelivery>false</DigitalDelivery><TransactionArray><Transaction><Buyer><Email>magicalbookseller@yahoo.com</Email></Buyer><ShippingDetails><SellingManagerSalesRecordNumber>104</SellingManagerSalesRecordNumber></ShippingDetails><Item><ItemID>110025788368</ItemID></Item><QuantityPurchased>1</QuantityPurchased><TransactionID>0</TransactionID><TransactionPrice currencyID="USD">18.0</TransactionPrice></Transaction><Transaction><Buyer><Email>magicalbookseller@yahoo.com</Email></Buyer><ShippingDetails><SellingManagerSalesRecordNumber>103</SellingManagerSalesRecordNumber></ShippingDetails><Item><ItemID>110025788765</ItemID></Item><QuantityPurchased>1</QuantityPurchased><TransactionID>0</TransactionID><TransactionPrice currencyID="USD">18.0</TransactionPrice></Transaction></TransactionArray><BuyerUserID>magicalbookseller</BuyerUserID></Order></OrderArray></GetOrdersResponse>'
+        
         parser.parseString(result, function parseXmlCallback(error, data) {
           if (error) {
             error.message = "Error parsing XML: " + error.message;
@@ -640,35 +632,7 @@ module.exports.checkAffiliateUrl = function checkAffiliateUrl(url) {
   return (regexAffil.test(url) && !regexNonAffil.test(url) && regexCampaign.test(url));
 };
 
-module.exports.processEbayOrder = function processEbayOrder(orderInfo){
 
-  order ={};
-  buyer = {};
-  orderItems = [];
-  order['relative_order_id'] = orderInfo['OrderID'];
-  order['amount'] = parseFloat(orderInfo['Total']['#']);
-  order['currencyType'] = orderInfo['Total']['@'];
-  order['orderDate'] = orderInfo.CreatedTime;
-  order['serviceType'] = 'ebay';
-  for(var index in orderInfo.TransactionArray.Transaction)
-  {
-    i = orderInfo.TransactionArray.Transaction[index];
-    console.log(i.TransactionPrice['#'], "item array");
-    temp = {};
-    temp['price'] = parseFloat(i.TransactionPrice['#']);
-    temp['currencyType'] = i.TransactionPrice['@'];
-    temp['quantityPurchased']= parseInt(i.QuantityPurchased);
-    temp['relative_listing_id'] =  i.Item.ItemID;
-    orderItems.push(temp);
-  }
-  buyer['email'] = orderInfo.TransactionArray.Transaction[0].Buyer.Email;
-  buyer['ebayBuyerUserId'] = orderInfo.BuyerUserID;
-  buyer['shippingAddress'] = orderInfo.ShippingAddress;
-
-
-
-  return ({order : order, buyer : buyer, orderItems : orderItems});
-}
 
 // check the latest API versions (to update the code accordingly)
 // callback gets hash of APIs:versions
