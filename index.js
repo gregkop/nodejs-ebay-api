@@ -154,7 +154,7 @@ var buildXmlInput = function buildXmlInput(opType, params) {
     top.push({ 'RequesterCredentials' : [ { 'eBayAuthToken' : params.authToken } ] });
     delete params.authToken;
   }
-  
+
   // for repeatable fields, use array values.
   // to keep this simpler, treat everything as an array value.
   _(params).each(function(values, key) {
@@ -375,14 +375,16 @@ var ebayApiPostXmlRequest = function ebayApiPostXmlRequest(options, callback) {
   console.log(options.reqOptions.data);
   
   var request = restler.post(url, options.reqOptions);
-  
+  console.log(request, "request");
   request.on('complete', function(result, response) {
     if (result instanceof Error) {
       var error = result;
       error.message = "Completed with error: " + error.message;
+      console.log (error, "error in oncomplete");
       return callback(error);
     }
     else if (response.statusCode !== 200) {
+      console.log (response, "not 200 status in oncomplete");
       return callback(new Error(util.format("Bad response status code", response.statusCode, result.toString())));
     }
     
@@ -403,6 +405,7 @@ var ebayApiPostXmlRequest = function ebayApiPostXmlRequest(options, callback) {
             error.message = "Error parsing XML: " + error.message;
             return next(error);
           }
+          
           next(null, data);
         });
       },
@@ -633,6 +636,33 @@ module.exports.checkAffiliateUrl = function checkAffiliateUrl(url) {
 };
 
 
+module.exports.processEbayOrder = function processEbayOrder(orderInfo){
+  //console.log(orderInfo['Total'], "order number: " + orderInfo['OrderID'] );
+  order ={};
+  buyer = {};
+  orderItems = [];
+  order['relative_order_id'] = orderInfo['OrderID'];
+  order['amount'] = parseFloat(orderInfo['Total']['#']);
+  order['currencyType'] = orderInfo['Total']['@']['currencyID'];
+  order['orderDate'] = orderInfo.CreatedTime;
+  order['serviceType'] = 'ebay';
+  
+  i = orderInfo.TransactionArray.Transaction;
+  console.log(orderInfo, "order number: " + orderInfo['OrderID'] );
+  temp = {};
+  temp['price'] = parseFloat(i.TransactionPrice['#']);
+  temp['currencyType'] = i.TransactionPrice['@']['currencyID'];
+  temp['quantityPurchased']= parseInt(i.QuantityPurchased);
+  temp['relative_listing_id'] =  i.Item.ItemID;
+  orderItems.push(temp);
+  
+  buyer['email'] = i.Buyer.Email;
+  buyer['ebayBuyerUserId'] = orderInfo.BuyerUserID;
+  //console.log(orderInfo.ShippingAddress, "shipping address");
+
+
+  return ({order : order, buyer : buyer, orderItems : orderItems, shippingAddress : orderInfo.ShippingAddress });
+}
 
 // check the latest API versions (to update the code accordingly)
 // callback gets hash of APIs:versions
