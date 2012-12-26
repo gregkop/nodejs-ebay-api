@@ -157,14 +157,14 @@ var buildXmlInput = function buildXmlInput(opType, params) {
     delete params.authToken;
   }
 
-  if (typeof params.EndUserIP !== 'undefined') {
+  /*if (typeof params.EndUserIP !== 'undefined') {
     top.push({'EndUserIP' : params.EndUserIP });
     delete params.EndUserIP;
   }
   if (typeof params.ItemID !== 'undefined') {
     top.push({'ItemID' : params.ItemID });
     delete params.ItemID;
-  }
+  }*/
   
 
   /*if (typeof params.EndUserIP !== 'undefined'){
@@ -656,33 +656,31 @@ module.exports.checkAffiliateUrl = function checkAffiliateUrl(url) {
 };
 
 module.exports.processEbayOrder = function processEbayOrder(orderInfo){
-
+  //console.log(orderInfo['Total'], "order number: " + orderInfo['OrderID'] );
   order ={};
   buyer = {};
   orderItems = [];
   order['relative_order_id'] = orderInfo['OrderID'];
   order['amount'] = parseFloat(orderInfo['Total']['#']);
-  order['currencyType'] = orderInfo['Total']['@'];
+  order['currencyType'] = orderInfo['Total']['@']['currencyID'];
   order['orderDate'] = orderInfo.CreatedTime;
   order['serviceType'] = 'ebay';
-  for(var index in orderInfo.TransactionArray.Transaction)
-  {
-    i = orderInfo.TransactionArray.Transaction[index];
-    console.log(i.TransactionPrice['#'], "item array");
-    temp = {};
-    temp['price'] = parseFloat(i.TransactionPrice['#']);
-    temp['currencyType'] = i.TransactionPrice['@'];
-    temp['quantityPurchased']= parseInt(i.QuantityPurchased);
-    temp['relative_listing_id'] =  i.Item.ItemID;
-    orderItems.push(temp);
-  }
-  buyer['email'] = orderInfo.TransactionArray.Transaction[0].Buyer.Email;
+  
+  i = orderInfo.TransactionArray.Transaction;
+  console.log(orderInfo, "order number: " + orderInfo['OrderID'] );
+  temp = {};
+  temp['price'] = parseFloat(i.TransactionPrice['#']);
+  temp['currencyType'] = i.TransactionPrice['@']['currencyID'];
+  temp['quantityPurchased']= parseInt(i.QuantityPurchased);
+  temp['relative_listing_id'] =  i.Item.ItemID;
+  orderItems.push(temp);
+  
+  buyer['email'] = i.Buyer.Email;
   buyer['ebayBuyerUserId'] = orderInfo.BuyerUserID;
-  buyer['shippingAddress'] = orderInfo.ShippingAddress;
+  //console.log(orderInfo.ShippingAddress, "shipping address");
 
 
-
-  return ({order : order, buyer : buyer, orderItems : orderItems});
+  return ({order : order, buyer : buyer, orderItems : orderItems, shippingAddress : orderInfo.ShippingAddress });
 }
 
 // check the latest API versions (to update the code accordingly)
