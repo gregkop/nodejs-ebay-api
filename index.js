@@ -167,10 +167,11 @@ var buildXmlInput = function buildXmlInput(opType, params) {
       top.push(el);      
     });
   });
-  top.push(params);
+ // top.push(params);
 
-  //\X\\\Corpseconsole.log(util.inspect(data,true,10));
+  console.log(util.inspect(data,true,10), "DATA FUCKING DATA");
   data = [ data ];
+
 
   return '<?xml version="1.0" encoding="UTF-8"?>' + "\n" + xmlBuilder(data, true);
 };
@@ -646,6 +647,10 @@ module.exports.processEbayOrder = function processEbayOrder(orderInfo){
   order['currencyType'] = orderInfo['Total']['@']['currencyID'];
   order['orderDate'] = orderInfo.CreatedTime;
   order['serviceType'] = 'ebay';
+  if(orderInfo['PaidTime'])
+    order['paidTime'] = orderInfo['PaidTime'];
+  if(orderInfo['ShippedTime'])
+    order['shippedTime'] = orderInfo['ShippedTime'];
   
   i = orderInfo.TransactionArray.Transaction;
   console.log(orderInfo, "order number: " + orderInfo['OrderID'] );
