@@ -105,7 +105,15 @@ var buildRequestUrl = function buildRequestUrl(serviceName, params, filters, san
       
       // params and filters don't apply to URLs w/ these
       return url;
-      // break;
+      break;
+
+    case 'ResolutionCaseManagement':   // ...and the other XML APIs
+      if (sandbox) url = 'http://svcs.sandbox.ebay.com/services/resolution/v1/ResolutionCaseManagementService';
+      else url = 'https://svcs.ebay.com/services/resolution/v1/ResolutionCaseManagementService';
+      
+      // params and filters don't apply to URLs w/ these
+      return url;
+      break;
     
     default:
       if (sandbox) {
