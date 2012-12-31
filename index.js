@@ -227,6 +227,17 @@ var defaultParams = function defaultParams(options) {
       });
       break;
     
+    case 'ResolutionCaseManagement':
+      params = {
+        'X-EBAY-SOA-OPERATION-NAME' : options.opType,
+        'X-EBAY-SOA-SECURITY-TOKEN' : options.authToken,
+        'X-EBAY-SOA-GLOBAL-ID' : 'EBAY_US', // US
+        'X-EBAY-API-DEV-NAME': options.devName,
+        'X-EBAY-API-CERT-NAME': options.cert,
+        'X-EBAY-API-APP-NAME': options.appName,
+        'appid': options.appId
+      };
+      break;   
     
     // [POST params >
     
