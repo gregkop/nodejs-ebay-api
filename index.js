@@ -163,21 +163,26 @@ var buildXmlInput = function buildXmlInput(opType, params) {
     delete params.authToken;
   }
 
-  // for repeatable fields, use array values.
-  // to keep this simpler, treat everything as an array value.
-  _(params).each(function(values, key) {
-    
-    if (!_.isArray(values)) values = [values];
-    
-    _(values).each(function(value){
-      var el = {};
-      el[key] = value;
-      top.push(el);      
+  if(opType == 'AddItem')
+    top.push(params);
+  else
+  {
+    // for repeatable fields, use array values.
+    // to keep this simpler, treat everything as an array value.
+    _(params).each(function(values, key) {
+      
+      if (!_.isArray(values)) values = [values];
+      
+      _(values).each(function(value){
+        var el = {};
+        el[key] = value;
+        top.push(el);      
+      });
     });
-  });
- // top.push(params);
+  }
 
-  console.log(util.inspect(data,true,10), "DATA FUCKING DATA");
+
+  //console.log(util.inspect(data,true,10), "DATA FUCKING DATA");
   data = [ data ];
 
 
