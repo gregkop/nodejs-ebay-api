@@ -168,6 +168,8 @@ var buildXmlInput = function buildXmlInput(opType, params) {
     top.push({ 'RequesterCredentials' : [ { 'eBayAuthToken' : params.authToken } ] });
     delete params.authToken;
   }
+  
+  console.log(params, 'PARAMS');
 
   if(opType == 'AddItem' || opType == 'ReviseItem')
     top.push(params);
@@ -176,21 +178,29 @@ var buildXmlInput = function buildXmlInput(opType, params) {
     // for repeatable fields, use array values.
     // to keep this simpler, treat everything as an array value.
     _(params).each(function(values, key) {
-      
-      if (!_.isArray(values)) values = [values];
+        console.log(values, "VALUE IN LOOP");
+        var el = {};
+        el[key] = values;
+
+        top.push(el);
+      /*if (!_.isArray(values)) values = [values];
+
       
       _(values).each(function(value){
+        console.log(value, "VALUE IN LOOP");
         var el = {};
         el[key] = value;
+
         top.push(el);      
-      });
+      });*/
+
     });
   }
-
 
   //console.log(util.inspect(data,true,10), "DATA FUCKING DATA");
   data = [ data ];
 
+  console.log(data[0]['GetOrdersRequest'], 'DATA');
 
   return '<?xml version="1.0" encoding="UTF-8"?>' + "\n" + xmlBuilder(data, true);
 };
