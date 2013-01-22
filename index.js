@@ -98,7 +98,13 @@ var buildRequestUrl = function buildRequestUrl(serviceName, params, filters, san
       else url = "http://open.api.ebay.com/shopping?";
       break;
     
-    
+    case 'Finding':
+      if (sandbox) url = 'http://svcs.sandbox.ebay.com/services/search/FindingService/v1';
+      else url = 'http://svcs.ebay.com/services/search/FindingService/v1';
+      
+      // params and filters don't apply to URLs w/ these
+      return url;
+      break;
     case 'Trading':   // ...and the other XML APIs
       if (sandbox) url = 'https://api.sandbox.ebay.com/ws/api.dll';
       else url = 'https://api.ebay.com/ws/api.dll';
