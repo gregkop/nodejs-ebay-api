@@ -169,7 +169,7 @@ var buildXmlInput = function buildXmlInput(opType, params) {
     delete params.authToken;
   }
 
-  if(opType == 'AddItem')
+  if(opType == 'AddItem' || opType == 'ReviseItem')
     top.push(params);
   else
   {
